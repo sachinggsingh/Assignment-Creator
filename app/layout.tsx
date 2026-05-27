@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   description: 'AI-powered assessment generation platform',
 }
 
+import { ThemeProvider } from '@/components/providers/theme-provider'
+import { Toaster } from 'sonner'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,14 +33,23 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground">
-        <StoreProvider>
-          <AuthProvider>
-            <AuthFlowGuard />
-            {children}
-          </AuthProvider>
-        </StoreProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <StoreProvider>
+            <AuthProvider>
+              <AuthFlowGuard />
+              {children}
+              <Toaster position="top-right" richColors />
+            </AuthProvider>
+          </StoreProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

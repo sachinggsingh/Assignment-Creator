@@ -528,15 +528,13 @@
 
 
 
-import { APICallError } from '@ai-sdk/provider'
 import { getAuthUser } from '@/lib/auth/session'
 import { NextResponse } from 'next/server'
-import { generateAssignment } from '@/lib/ai/generate-assignment'
-import { formatAiError } from '@/lib/ai/errors'
 import { connectDB } from '@/lib/db'
 import { Assignment as AssignmentModel } from '@/models/assignment'
 import { GeneratedAssignment } from '@/models/generatedAssignment'
 import { SubmitAssignment } from '@/models/submitAssignment'
+import { assignmentQueue } from '@/lib/bullmq/queue/assignment.queue'
 
 import type {
   Assignment,
@@ -826,35 +824,6 @@ function toAssignmentResponse(
   }
 }
 
-function getErrorStatus(
-  error: unknown,
-  message: string
-): number {
-  if (
-    APICallError.isInstance(error) &&
-    error.statusCode === 429
-  ) {
-    return 429
-  }
-
-  if (
-    /rate limit|quota exceeded/i.test(
-      message
-    )
-  ) {
-    return 429
-  }
-
-  if (
-    /API key|unauthorized/i.test(
-      message
-    )
-  ) {
-    return 503
-  }
-
-  return 400
-}
 
 export async function POST(
   request: Request
@@ -924,201 +893,39 @@ export async function POST(
       )
     }
 
-    console.log(
-      '[POST /api/assignments] Generating assignment...'
-    )
-
-    const generated =
-      await generateAssignment(input)
-
-    console.log(
-      '[POST /api/assignments] AI generation successful.'
-    )
-
-    await connectDB()
-
-    const assignment =
-      await AssignmentModel.create({
+    // Enqueue the job to BullMQ instead of running synchronously
+    const job = await assignmentQueue.add(
+      'generate-assignment',
+      {
         title: input.title,
-
-        dueDate,
-
-        questionTypes:
-          input.questionTypes,
-
+        dueDate: input.dueDate,
+        questionTypes: input.questionTypes,
+        additionalInstructions: input.additionalInstructions,
         createdBy: user.id,
-      })
-
-    const normalizedSections: NormalizedSection[] =
-      Array.isArray(
-        generated.sections
-      )
-        ? generated.sections.map(
-            (
-              section: GeneratedSection,
-              index: number
-            ) => {
-              const config =
-                input.questionTypes[
-                  index
-                ]
-
-              const expectedMarks =
-                config?.marksPerQuestion ??
-                1
-
-              const expectedType =
-                config?.type ?? 'MCQ'
-
-              const expectedDifficulty =
-                config?.difficulty ??
-                'medium'
-
-              const questions: NormalizedQuestion[] =
-                Array.isArray(
-                  section.questions
-                )
-                  ? section.questions.map(
-                      (
-                        q: GeneratedQuestion
-                      ) => ({
-                        questionText:
-                          q.questionText ||
-                          q.question ||
-                          '',
-
-                        difficulty:
-                          q.difficulty ||
-                          expectedDifficulty,
-
-                        marks:
-                          Number(
-                            q.marks
-                          ) ||
-                          expectedMarks,
-
-                        type:
-                          q.type ||
-                          expectedType,
-
-                        options:
-                          Array.isArray(
-                            q.options
-                          )
-                            ? q.options
-                            : [],
-
-                        answer:
-                          q.answer || '',
-                      })
-                    )
-                  : []
-
-              const sectionMarks =
-                questions.reduce(
-                  (
-                    sum,
-                    q
-                  ) =>
-                    sum + q.marks,
-                  0
-                )
-
-              return {
-                title:
-                  section.title ||
-                  'Section',
-
-                instructions:
-                  section.instructions ||
-                  '',
-
-                totalMarks:
-                  Number(
-                    section.totalMarks
-                  ) ||
-                  sectionMarks,
-
-                questions,
-              }
-            }
-          )
-        : []
-
-    const computedTotalMarks =
-      normalizedSections.reduce(
-        (
-          sum,
-          section
-        ) =>
-          sum +
-          section.totalMarks,
-        0
-      )
-
-    const generatedDoc =
-      await GeneratedAssignment.create(
-        {
-          assignmentId:
-            assignment._id,
-
-          generatedPrompt:
-            generated.prompt,
-
-          sections:
-            normalizedSections,
-
-          totalMarks:
-            Number(
-              generated.totalMarks
-            ) ||
-            computedTotalMarks ||
-            1,
-
-          generatedBy: user.id,
-
-          llmProvider: 'nvidia',
-
-          modelId:
-            generated.modelId,
-
-          rawResponse: {
-            rawText:
-              generated.rawText,
-
-            modelId:
-              generated.modelId,
-          },
-        }
-      )
+      },
+      {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        },
+        removeOnComplete: 100,
+        removeOnFail: 50,
+      }
+    )
 
     console.log(
-      '[POST /api/assignments] Database records created successfully.'
+      `[POST /api/assignments] Job enqueued: ${job.id}`
     )
 
     return NextResponse.json(
       {
-        assignment:
-          toAssignmentResponse(
-            assignment.toObject(),
-            {
-              _id:
-                generatedDoc._id,
-
-              totalMarks:
-                generatedDoc.totalMarks,
-
-              sections:
-                generatedDoc.sections as Record<
-                  string,
-                  unknown
-                >[],
-            },
-            false
-          ),
+        success: true,
+        message: 'Assignment generation started',
+        jobId: job.id,
       },
       {
-        status: 201,
+        status: 202,
       }
     )
   } catch (error) {
@@ -1128,20 +935,16 @@ export async function POST(
     )
 
     const message =
-      formatAiError(error)
-
-    const status =
-      getErrorStatus(
-        error,
-        message
-      )
+      error instanceof Error
+        ? error.message
+        : 'Failed to start assignment generation'
 
     return NextResponse.json(
       {
         error: message,
       },
       {
-        status,
+        status: 500,
       }
     )
   }

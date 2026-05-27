@@ -23,6 +23,7 @@ export const createAssignment = createAsyncThunk(
   'assignments/createAssignment',
   async (payload: CreateAssignmentPayload, { rejectWithValue, signal }) => {
     try {
+      // 1. Submit the generation request
       const response = await fetch('/api/assignments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -39,7 +40,42 @@ export const createAssignment = createAsyncThunk(
       }
 
       const data = await response.json()
-      return data.assignment as Assignment
+      
+      if (!data.jobId) {
+        return rejectWithValue('No job ID returned from server')
+      }
+
+      const { jobId } = data
+      
+      // 2. Poll for completion
+      while (true) {
+        if (signal.aborted) {
+          return rejectWithValue('Request was cancelled.')
+        }
+
+        const pollRes = await fetch(`/api/assignments/job/${jobId}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          signal,
+        })
+
+        if (!pollRes.ok) {
+          return rejectWithValue(await readApiError(pollRes))
+        }
+
+        const pollData = await pollRes.json()
+
+        if (pollData.state === 'completed') {
+          return pollData.assignment as Assignment
+        } else if (pollData.state === 'failed') {
+          return rejectWithValue(pollData.error || 'Assignment generation failed')
+        }
+
+        // Wait before next poll
+        await new Promise(resolve => setTimeout(resolve, 2000))
+      }
+
     } catch (error) {
       if (signal.aborted) {
         return rejectWithValue('Request was cancelled.')

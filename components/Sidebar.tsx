@@ -23,6 +23,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
+import { ThemeToggle } from "@/components/theme-toggle"
+
 const navItems = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Create Assessments", href: "/create-assessments", icon: FileText },
@@ -42,19 +44,27 @@ export function AppSidebar() {
     }
 
     return isTeacher
+  }).map((item) => {
+    if (item.href === "/result" && isTeacher) {
+      return { ...item, title: "Papers Generated" }
+    }
+    return item
   })
 
   return (
     <Sidebar>
       <SidebarHeader className="border-b border-border">
-        <div className="flex items-center gap-3 px-2 py-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-semibold">
-            AM
+        <div className="flex items-center justify-between px-2 py-2">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-semibold">
+              AM
+            </div>
+            <div>
+              <p className="text-sm font-semibold">AssessMind AI</p>
+              <p className="text-xs text-muted-foreground">Workspace</p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-semibold">AssessMind AI</p>
-            <p className="text-xs text-muted-foreground">Workspace</p>
-          </div>
+          <ThemeToggle />
         </div>
       </SidebarHeader>
 

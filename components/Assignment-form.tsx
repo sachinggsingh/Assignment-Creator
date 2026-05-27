@@ -7,6 +7,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Check } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -215,9 +216,10 @@ export function AssignmentForm() {
     try {
       await dispatch(createAssignment(payload)).unwrap()
       reset()
+      toast.success("Assignment created successfully!")
       router.push('/attend-assessments')
-    } catch {
-      // error in Redux state
+    } catch (err: any) {
+      toast.error(err?.message || err || "Failed to create assignment")
     } finally {
       submitInFlightRef.current = false
     }
