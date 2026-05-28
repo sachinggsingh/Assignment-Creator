@@ -127,4 +127,13 @@
   html {
     @apply font-sans;
   }
+
+  input:-webkit-autofill,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--foreground);
+    -webkit-box-shadow: 0 0 0px 1000px var(--input) inset;
+    box-shadow: 0 0 0px 1000px var(--input) inset;
+    caret-color: var(--foreground);
+  }
 }

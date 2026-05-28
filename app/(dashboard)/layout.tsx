@@ -5,6 +5,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { AppSidebar } from '@/components/Sidebar'
 import { UserMenu } from '@/components/user-menu'
 import { useAuth } from '@/components/providers/auth-provider'
@@ -17,10 +18,10 @@ function DashboardHeader() {
       <div className="flex items-center gap-3">
         <SidebarTrigger />
         <div>
-          <p className="text-xl font-medium text-primary">Welcome back</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xl font-medium text-primary">Welcome back {" "}  {user?.name ?? 'Signed-in workspace navigation'}</p>
+          {/* <p className="text-sm text-muted-foreground">
             {user?.name ?? 'Signed-in workspace navigation'}
-          </p>
+          </p> */}
         </div>
       </div>
 
@@ -35,14 +36,16 @@ export default function DashboardLayout({
   children: React.ReactNode
 }>) {
   return (
-    <SidebarProvider>
-      <AppSidebar />
+    <TooltipProvider>
+      <SidebarProvider>
+        <AppSidebar />
 
-      <SidebarInset className="min-h-screen bg-background">
-        <DashboardHeader />
+        <SidebarInset className="min-h-screen bg-background">
+          <DashboardHeader />
 
-        <main className="flex-1 p-6">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
+          <main className="flex-1 p-6">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
+    </TooltipProvider>
   )
 }

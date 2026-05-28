@@ -1,18 +1,9 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { LogOut } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { useAuth } from '@/components/providers/auth-provider'
 
 export function UserMenu() {
-  const router = useRouter()
-  const { user, signOut } = useAuth()
-
-  const handleSignOut = async () => {
-    await signOut()
-    router.replace('/sign-in')
-  }
+  const { user } = useAuth()
 
   if (!user) return null
 
@@ -32,10 +23,6 @@ export function UserMenu() {
       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
         {initials}
       </div>
-      <Button variant="outline" size="sm" onClick={handleSignOut}>
-        <LogOut className="mr-2 h-4 w-4" />
-        Sign out
-      </Button>
     </div>
   )
 }

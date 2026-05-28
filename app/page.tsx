@@ -34,17 +34,17 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen bg-white text-black dark:bg-black dark:text-white"
+      className="min-h-screen bg-background text-foreground"
       style={{ fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif" }}
     >
       {/* Navigation */}
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-black/10 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-black/90">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
           <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-black dark:bg-white">
-              <Brain className="h-5 w-5 text-white dark:text-black" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Brain className="h-5 w-5" />
             </div>
-            <span className="text-sm font-semibold tracking-tight">AssessMind AI</span>
+            <span className="text-sm font-semibold tracking-tight">VedaAI</span>
           </Link>
 
           <div className="hidden items-center gap-8 md:flex">
@@ -158,14 +158,14 @@ export default function Home() {
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/sign-up"
-              className="inline-flex items-center gap-2 rounded-full bg-black px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/90"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-95"
             >
               Start Free Trial
               <ArrowRight className="h-4 w-4" />
             </Link>
             <a
               href="#features"
-              className="inline-flex items-center gap-2 rounded-full border border-black/20 px-8 py-3.5 text-sm font-semibold transition-all hover:border-black dark:border-white/20 dark:hover:border-white"
+              className="inline-flex items-center gap-2 rounded-full border border-border px-8 py-3.5 text-sm font-semibold transition-all hover:border-primary hover:text-foreground"
             >
               See Features
             </a>
@@ -276,7 +276,7 @@ export default function Home() {
                   <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest opacity-50">Most Popular</p>
                 )}
                 <h3 className="text-2xl font-black tracking-tight">{plan.name}</h3>
-                <p className={`mt-1 text-sm ${plan.highlight ? 'opacity-60' : 'text-black/40 dark:text-white/40'}`}>
+                <p className={`mt-1 text-sm ${plan.highlight ? 'opacity-80' : 'text-muted-foreground'}`}>
                   {plan.description}
                 </p>
                 <div className="mt-6 flex items-baseline gap-1">
@@ -291,8 +291,8 @@ export default function Home() {
                   href="/sign-up"
                   className={`mt-6 flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold transition-all ${
                     plan.highlight
-                      ? 'bg-white text-black hover:bg-white/90 dark:bg-black dark:text-white dark:hover:bg-black/90'
-                      : 'border border-black/20 hover:border-black hover:bg-black hover:text-white dark:border-white/20 dark:hover:border-white dark:hover:bg-white dark:hover:text-black'
+                      ? 'bg-primary text-primary-foreground hover:opacity-90'
+                      : 'border border-border hover:border-primary hover:text-foreground'
                   }`}
                 >
                   {plan.cta}
@@ -328,13 +328,13 @@ export default function Home() {
             </div>
             <div className="space-y-5 text-base leading-relaxed text-black/60 dark:text-white/60">
               <p>
-                AssessMind AI was founded with one mission: to revolutionize how educators create assessments while keeping the human touch at the center.
+                VedaAI was founded with one mission: to revolutionize how educators create assessments while keeping the human touch at the center.
               </p>
               <p>
                 Our platform combines pedagogical expertise with current AI capabilities to generate thoughtful, high-quality assessments that save time and improve learning outcomes.
               </p>
               <p>
-                Whether you&apos;re a teacher, trainer, or learning leader, AssessMind AI adapts to your unique needs and helps you move from idea to ready-to-use content quickly.
+                Whether you&apos;re a teacher, trainer, or learning leader, VedaAI adapts to your unique needs and helps you move from idea to ready-to-use content quickly.
               </p>
             </div>
           </div>
@@ -355,7 +355,7 @@ export default function Home() {
                 name: 'Sarah Johnson',
                 role: 'High School Teacher',
                 initials: 'SJ',
-                text: "AssessMind AI saved me hours every week. I can now focus on what matters most — teaching and student engagement.",
+                text: "VedaAI saved me hours every week. I can now focus on what matters most — teaching and student engagement.",
               },
               {
                 name: 'Marcus Chen',
@@ -396,16 +396,16 @@ export default function Home() {
       </section>
 
       {/* CTA Banner */}
-      <section className="border-t border-black/10 px-6 py-24 dark:border-white/10 lg:px-8">
+      <section className="border-t border-border px-6 py-24 lg:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="overflow-hidden rounded-3xl bg-black px-10 py-16 text-white dark:bg-white dark:text-black sm:px-16">
+          <div className="overflow-hidden rounded-3xl bg-primary px-10 py-16 text-primary-foreground sm:px-16">
             <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-4xl font-black tracking-tighter sm:text-5xl">
                   Ready to get started?
                 </h2>
                 <p className="mt-3 text-base opacity-60">
-                  Join 10,000+ educators already using AssessMind AI.
+                  Join 10,000+ educators already using VedaAI.
                 </p>
               </div>
               <Link
@@ -429,7 +429,7 @@ export default function Home() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black dark:bg-white">
                   <Brain className="h-4 w-4 text-white dark:text-black" />
                 </div>
-                <span className="text-sm font-bold">AssessMind AI</span>
+                <span className="text-sm font-bold">VedaAI</span>
               </div>
               <p className="text-sm text-black/40 dark:text-white/40">
                 Revolutionizing assessment creation with AI technology.
@@ -483,7 +483,7 @@ export default function Home() {
               ))}
             </div>
             <p className="text-xs text-black/30 dark:text-white/30">
-              © 2024 AssessMind AI. All rights reserved.
+              © 2024 VedaAI. All rights reserved.
             </p>
           </div>
         </div>

@@ -79,7 +79,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm font-medium text-primary">Overview</p>
+        {/* <p className="text-sm font-medium text-primary">Overview</p> */}
         <h1 className="mt-2 text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="mt-2 text-muted-foreground">
           Welcome back, {user.name}. Manage assessments, review progress, and create new work from here.

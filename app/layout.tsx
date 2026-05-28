@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'AssessMind AI',
+  title: 'VedaAI',
   description: 'AI-powered assessment generation platform',
 }
 
@@ -46,7 +46,7 @@ export default function RootLayout({
             <AuthProvider>
               <AuthFlowGuard />
               {children}
-              <Toaster position="top-right" richColors />
+              <Toaster position="bottom-center" richColors />
             </AuthProvider>
           </StoreProvider>
         </ThemeProvider>

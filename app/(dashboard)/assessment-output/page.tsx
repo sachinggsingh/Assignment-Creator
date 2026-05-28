@@ -7,7 +7,7 @@ import type { RootState } from '@/lib/store'
 import type {  GeneratedSection, GeneratedQuestion } from '@/types/type'
 import { ClientFormattedDate } from '@/components/client-formatted-date'
 import { resetAssignmentStatus, clearFormSnapshot, discardAssignment } from '@/lib/features/assignments/assignmentSlice'
-
+import { Database, Trash } from 'lucide-react'
 export default function AssessmentOutputPage() {
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -75,13 +75,13 @@ export default function AssessmentOutputPage() {
               onClick={handleSave}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
             >
-              💾 Save to DB
+              <Database/> Publish
             </button>
             <button
               onClick={handleRegenerate}
               className="rounded-lg border border-border px-4 py-2 text-sm font-semibold"
             >
-              🔄 Regenerate
+              <Trash /> Regenerate
             </button>
           </div>
         </div>

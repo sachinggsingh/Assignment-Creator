@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import {
   ArrowRight,
   BarChart3,
-  Brain,
   CheckCircle2,
   GraduationCap,
   Loader2,
@@ -15,7 +14,6 @@ import {
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { UserMenu } from '@/components/user-menu'
 import { useAuth } from '@/components/providers/auth-provider'
 import { cn } from '@/lib/utils'
 import { getPersistedRole, setStoredRole } from '@/lib/auth-role'
@@ -124,24 +122,6 @@ export default function SelectRolePage() {
       className="min-h-screen bg-background text-foreground"
       style={{ fontFamily: "'DM Sans', 'Helvetica Neue', var(--font-sans), sans-serif" }}
     >
-      <header className="border-b border-border/80 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Brain className="h-5 w-5" />
-            </div>
-            <span className="text-sm font-semibold tracking-tight">AssessMind AI</span>
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <p className="hidden text-sm text-muted-foreground sm:block">
-              Signed in as <span className="font-medium text-foreground">{user.name}</span>
-            </p>
-            <UserMenu />
-          </div>
-        </div>
-      </header>
-
       <main className="mx-auto max-w-6xl px-6 py-12 sm:py-16">
         <div className="mx-auto max-w-2xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground">
@@ -149,7 +129,7 @@ export default function SelectRolePage() {
             One last step
           </div>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            How will you use AssessMind?
+            How will you use VedaAI?
           </h1>
           <p className="mt-3 text-base text-muted-foreground sm:text-lg">
             Pick the experience that fits you. You can update this later from your profile settings.
