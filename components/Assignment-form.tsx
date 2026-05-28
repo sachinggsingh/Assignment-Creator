@@ -264,9 +264,7 @@ export function AssignmentForm() {
 
     try {
       dispatch(setFormSnapshot(payload))
-
-      dispatch(createAssignment(payload))
-
+      void dispatch(createAssignment(payload))
       router.push('/assessment-output')
     } catch (err: unknown) {
       const message =

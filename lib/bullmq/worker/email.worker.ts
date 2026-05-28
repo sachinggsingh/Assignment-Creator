@@ -1,5 +1,5 @@
 import { Worker } from "bullmq"
-import IORedis from "ioredis"
+import { createBullMQConnection } from "../../redis/redis"
 import { sendMail } from "../../mail/sendMail"
 
 new Worker(
@@ -20,6 +20,6 @@ new Worker(
     }
   },
   {
-    connection: new IORedis(process.env.REDIS_URL!, { maxRetriesPerRequest: null, enableReadyCheck: false }),
+    connection: createBullMQConnection(),
   }
 )

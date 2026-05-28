@@ -1,6 +1,6 @@
 import { Worker } from "bullmq"
-import IORedis from "ioredis"
 import { connectDB } from "../../db"
+import { createBullMQConnection } from "../../redis/redis"
 import { Assignment } from "../../../models/assignment"
 import { GeneratedAssignment } from "../../../models/generatedAssignment"
 import { generateAssignment } from "../../ai/generate-assignment"
@@ -142,10 +142,24 @@ const worker = new Worker(
       await job.updateProgress(100)
       console.log("[Worker] Job completed successfully")
 
-      // Return data so it can be retrieved via job.returnvalue
+      const assignmentPayload = {
+        _id: String(assignment._id),
+        title: assignment.title,
+        dueDate: assignment.dueDate.toISOString(),
+        questionTypes: assignment.questionTypes,
+        createdAt: assignment.createdAt.toISOString(),
+        updatedAt: assignment.updatedAt.toISOString(),
+        generated: {
+          _id: String(generatedDoc._id),
+          totalMarks: generatedDoc.totalMarks,
+          sections: normalizedSections,
+        },
+      }
+
       return {
         assignmentId: String(assignment._id),
         generatedId: String(generatedDoc._id),
+        assignment: assignmentPayload,
       }
     } catch (error) {
       console.error("[Worker] Job failed:", error)
@@ -153,10 +167,7 @@ const worker = new Worker(
     }
   },
   {
-    connection: new IORedis(process.env.REDIS_URL!, {
-      maxRetriesPerRequest: null,
-      enableReadyCheck: false,
-    }),
+    connection: createBullMQConnection(),
     concurrency: 3,
   }
 )

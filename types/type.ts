@@ -88,6 +88,10 @@ export interface AssignmentState {
   status: AssignmentStatus
   error: string | null
   createdAssignment: Assignment | null
+  /** BullMQ job state while generating (active, waiting, …) */
+  generationState: string | null
+  /** 0–100 from worker progress updates */
+  generationProgress: number
 }
 
 export interface IQuestionConfig {

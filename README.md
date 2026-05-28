@@ -81,8 +81,9 @@ GEMINI_API_KEY=your_gemini_api_key
 GEMINI_MODEL=gemini-2.5-flash          # optional, defaults to gemini-2.5-flash
 GEMINI_FALLBACK_MODEL=gemini-2.0-flash-lite  # optional
 
-# Redis
+# Redis (local Docker, or Upstash: rediss://default:TOKEN@host:6379)
 REDIS_URL=redis://127.0.0.1:6379
+# REDIS_FAMILY=6   # optional, if Upstash requires IPv6
 
 # ── Optional ──────────────────────────────────────────────
 # Email (for assignment notifications)
