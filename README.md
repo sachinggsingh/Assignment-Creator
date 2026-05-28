@@ -2,6 +2,30 @@
 
 AssessMind is a modern, full-stack web application designed to automatically generate high-quality assignments and assessments using Artificial Intelligence. It leverages the Vercel AI SDK with Google's Gemini models and robust background job processing for seamless user experiences.
 
+## Application preview
+
+Role-based dashboards give teachers and students different navigation and workflows.
+
+### Teacher dashboard
+
+Teachers can create assessments with AI-generated sections, browse generated papers, and review assignment details.
+
+<p align="center">
+  <img src="./docs/screenshots/teacher-create-assessment.png" alt="Teacher — create assessment" width="32%" />
+  <img src="./docs/screenshots/teacher-attend-assessments.png" alt="Teacher — attend assessments" width="32%" />
+  <img src="./docs/screenshots/teacher-assessment-detail.png" alt="Teacher — assessment detail" width="32%" />
+</p>
+
+### Student dashboard
+
+Students see their progress on the home dashboard, view graded results, and read AI feedback per question.
+
+<p align="center">
+  <img src="./docs/screenshots/student-dashboard.png" alt="Student — dashboard" width="32%" />
+  <img src="./docs/screenshots/student-results.png" alt="Student — results" width="32%" />
+  <img src="./docs/screenshots/student-results-breakdown.png" alt="Student — results breakdown" width="32%" />
+</p>
+
 ## 🏗️ System Architecture & Design
 
 This project is built using a modern decoupled architecture that separates the frontend interaction layer from heavy background processing tasks.
