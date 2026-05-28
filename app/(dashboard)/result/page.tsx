@@ -6,7 +6,6 @@ import { ClientFormattedDate } from '@/components/client-formatted-date'
 import type { Assignment } from '@/types/type'
 import Link from 'next/link'
 
-/* ── Teacher helpers (original logic) ───────────────────────── */
 function totalMarks(assignment: Assignment) {
   return assignment.generated?.totalMarks ??
     assignment.questionTypes.reduce(
@@ -22,7 +21,6 @@ function totalQuestions(assignment: Assignment) {
   )
 }
 
-/* ── Radial Score Gauge (reused from detail page) ──────────── */
 function RadialScoreGauge({ score, total }: { score: number; total: number }) {
   const percentage = total > 0 ? (score / total) * 100 : 0
   const radius = 40
@@ -64,9 +62,28 @@ function RadialScoreGauge({ score, total }: { score: number; total: number }) {
   )
 }
 
-/* ── Student Results View ──────────────────────────────────── */
 function StudentResultsView() {
-  const [submissions, setSubmissions] = useState<any[]>([])
+  type QuestionFeedback = {
+    questionText?: string
+    marksObtained: number
+    maxMarks: number
+    studentAnswerText?: string
+    feedback?: string
+  }
+
+  type Submission = {
+    _id: string
+    score?: number
+    totalMarks?: number
+    questionsFeedback?: QuestionFeedback[]
+    pdfUrl?: string
+    createdAt?: string
+    assignmentId?: { title?: string }
+    status?: string
+    feedback?: string
+  }
+
+  const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -176,9 +193,9 @@ function StudentResultsView() {
       ) : (
         <div className="grid gap-4">
           {submissions.map((submission) => {
-            const percentage = submission.totalMarks > 0
-              ? (submission.score / submission.totalMarks) * 100
-              : 0
+            const scoreVal = submission.score ?? 0
+            const totalVal = submission.totalMarks ?? 0
+            const percentage = totalVal > 0 ? (scoreVal / totalVal) * 100 : 0
             const isExpanded = expandedId === submission._id
             const assignmentTitle = submission.assignmentId?.title || 'Assessment'
 
@@ -194,17 +211,17 @@ function StudentResultsView() {
                 {/* Main row */}
                 <div className="flex flex-wrap items-center gap-4 p-5">
                   {/* Score gauge */}
-                  <RadialScoreGauge score={submission.score} total={submission.totalMarks} />
+                  <RadialScoreGauge score={scoreVal} total={totalVal} />
 
                   {/* Info */}
                   <div className="flex-1 min-w-0 space-y-1">
                     <p className="text-lg font-semibold text-foreground truncate">{assignmentTitle}</p>
                     <p className="text-xs text-muted-foreground">
-                      Submitted on {new Date(submission.createdAt).toLocaleDateString()} at {new Date(submission.createdAt).toLocaleTimeString()}
+                      Submitted on {submission.createdAt ? new Date(submission.createdAt).toLocaleDateString() : '-'} at {submission.createdAt ? new Date(submission.createdAt).toLocaleTimeString() : '-'}
                     </p>
                     <div className="flex flex-wrap items-center gap-2 pt-1">
                       <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${gradeBadgeColor}`}>
-                        {submission.score.toFixed(1).replace('.0', '')} / {submission.totalMarks} marks
+                        {(scoreVal).toFixed(1).replace('.0', '')} / {totalVal} marks
                       </span>
                       <span className="rounded-full border border-border bg-muted/30 px-2.5 py-0.5 text-xs text-muted-foreground">
                         {submission.status === 'graded' ? '✓ Graded' : '⏳ Pending'}
@@ -290,7 +307,7 @@ function StudentResultsView() {
                       <div className="space-y-3">
                         <p className="text-[10px] uppercase font-bold tracking-wider text-foreground">Question-by-Question Breakdown</p>
                         <div className="grid gap-3">
-                          {submission.questionsFeedback.map((qf: any, idx: number) => {
+                          {submission.questionsFeedback.map((qf: QuestionFeedback, idx: number) => {
                             const qPct = qf.maxMarks > 0 ? (qf.marksObtained / qf.maxMarks) * 100 : 0
                             let qBadge = 'bg-red-500/10 text-red-500 border-red-500/20'
                             if (qPct >= 75) qBadge = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
@@ -340,7 +357,7 @@ function StudentResultsView() {
   )
 }
 
-/* ── Teacher Results View (original logic preserved) ───────── */
+
 function TeacherResultsView() {
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [loading, setLoading] = useState(true)
@@ -469,7 +486,7 @@ function TeacherResultsView() {
   )
 }
 
-/* ── Main Page (role-based routing) ────────────────────────── */
+
 export default function Page() {
   const { user } = useAuth()
   const role = user?.role

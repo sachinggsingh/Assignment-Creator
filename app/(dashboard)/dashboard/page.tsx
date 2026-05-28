@@ -30,7 +30,7 @@ export default async function DashboardPage() {
     generatedAssignments.forEach((gen) => {
       totalMarks += (gen.totalMarks || 0)
       if (Array.isArray(gen.sections)) {
-        gen.sections.forEach((sec: any) => {
+        gen.sections.forEach((sec: { questions?: unknown[] }) => {
           if (Array.isArray(sec.questions)) {
             totalQuestions += sec.questions.length
           }

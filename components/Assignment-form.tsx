@@ -1,25 +1,27 @@
 'use client'
 
-import { ClientFormattedDate } from '@/components/client-formatted-date'
+// import { ClientFormattedDate } from '@/components/client-formatted-date'
 import { useRouter } from 'next/navigation'
 import { useMemo, useRef, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Check } from 'lucide-react'
+// removed unused Check import
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
+import type { RootState } from '@/lib/store'
 import { ASSIGNMENT_QUESTION_TYPES } from '@/types/type'
-import { createAssignment, resetAssignmentStatus } from '@/lib/features/assignments/assignmentSlice'
+import { createAssignment, resetAssignmentStatus, setFormSnapshot } from '@/lib/features/assignments/assignmentSlice'
 import type {
   CreateAssignmentPayload,
   DifficultyLevel,
-  GeneratedSection,
+  // GeneratedSection,
   QuestionTypePayload,
+  AssignmentQuestionType,
 } from '@/types/type'
 
 const assignmentSchema = z.object({
@@ -75,86 +77,12 @@ function buildQuestionTypesFromConfig(config: AssignmentFormData['questionConfig
   }))
 }
 
-function GeneratedPreview({
-  title,
-  dueDate,
-  questionTypes,
-  generated,
-}: {
-  title: string
-  dueDate: string
-  questionTypes: { type: string }[]
-  generated: {
-    totalMarks: number
-    sections: GeneratedSection[]
-  }
-}) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <p className="text-sm font-semibold text-foreground">Assignment preview</p>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Due date</p>
-          <p className="mt-1 text-sm font-medium text-foreground">
-            <ClientFormattedDate value={dueDate} />
-          </p>
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Question types</p>
-          <p className="mt-1 text-sm font-medium text-foreground">
-            {questionTypes.map((item) => item.type).join(', ')}
-          </p>
-        </div>
-      </div>
-      <div className="mt-4">
-        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Title</p>
-        <p className="mt-1 text-sm text-foreground">
-          {title}
-        </p>
-      </div>
-      <div className="mt-6 space-y-4">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Generated paper</p>
-          <p className="mt-1 text-sm text-foreground">
-            {generated.sections.length} section(s),{' '}
-            {generated.sections.reduce((sum, section) => sum + section.questions.length, 0)} questions,{' '}
-            {generated.totalMarks} total marks
-          </p>
-        </div>
-        {generated.sections.map((section) => (
-          <div key={section.title} className="rounded-lg border border-border bg-muted/20 p-4">
-            <h3 className="text-sm font-semibold text-foreground">{section.title}</h3>
-            {section.instructions ? (
-              <p className="mt-1 text-xs text-muted-foreground">{section.instructions}</p>
-            ) : null}
-            <ol className="mt-3 space-y-3">
-              {section.questions.map((question, index) => (
-                <li key={`${section.title}-${index}`} className="text-sm text-foreground">
-                  <span className="font-medium">Q{index + 1}.</span> {question.questionText}
-                  <span className="ml-2 text-xs text-muted-foreground">
-                    ({question.type}, {question.marks} marks, {question.difficulty})
-                  </span>
-                  {question.options && question.options.length > 0 ? (
-                    <ul className="mt-1 list-disc pl-5 text-xs text-muted-foreground">
-                      {question.options.map((option) => (
-                        <li key={option}>{option}</li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </li>
-              ))}
-            </ol>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
+// GeneratedPreview moved to output page — removed to satisfy lint rules
 
 export function AssignmentForm() {
   const router = useRouter()
   const dispatch = useAppDispatch()
-  const { status, error, createdAssignment } = useAppSelector((state) => state.assignments)
+  const { status, error, formSnapshot } = useAppSelector((state: RootState) => state.assignments)
   const [formError, setFormError] = useState<string | null>(null)
   const submitInFlightRef = useRef(false)
 
@@ -167,11 +95,23 @@ export function AssignmentForm() {
     control,
   } = useForm<AssignmentFormData>({
     resolver: zodResolver(assignmentSchema),
-    defaultValues: {
-      questionConfig: [
-        { type: 'MCQ', difficulty: 'medium', numberOfQuestions: '5', marksPerQuestion: '2' },
-      ],
-    },
+    defaultValues: formSnapshot
+      ? {
+          title: formSnapshot.title,
+          dueDate: formSnapshot.dueDate,
+          questionConfig: formSnapshot.questionTypes.map((q: QuestionTypePayload) => ({
+            type: q.type,
+            difficulty: (q.difficulty as DifficultyLevel) || 'medium',
+            numberOfQuestions: String(q.numberOfQuestions),
+            marksPerQuestion: String(q.marksPerQuestion),
+          })),
+          additionalInstructions: formSnapshot.additionalInstructions ?? '',
+        }
+      : {
+          questionConfig: [
+            { type: 'MCQ', difficulty: 'medium', numberOfQuestions: '5', marksPerQuestion: '2' },
+          ],
+        },
   })
 
   const { fields, append, remove, replace } = useFieldArray({
@@ -190,7 +130,7 @@ export function AssignmentForm() {
   }, [questionConfig])
 
   const buildPayload = (data: AssignmentFormData): CreateAssignmentPayload | null => {
-    const hasInvalidType = data.questionConfig.some((row) => !ASSIGNMENT_QUESTION_TYPES.includes(row.type as any))
+    const hasInvalidType = data.questionConfig.some((row) => !ASSIGNMENT_QUESTION_TYPES.includes(row.type as AssignmentQuestionType))
     if (hasInvalidType) {
       setFormError('Please choose a valid question type for every section')
       return null
@@ -214,12 +154,14 @@ export function AssignmentForm() {
     setFormError(null)
 
     try {
-      await dispatch(createAssignment(payload)).unwrap()
-      reset()
-      toast.success("Assignment created successfully!")
-      router.push('/attend-assessments')
-    } catch (err: any) {
-      toast.error(err?.message || err || "Failed to create assignment")
+      // Save form snapshot so it can be pre-filled if teacher regenerates
+      dispatch(setFormSnapshot(payload))
+      // Start generation (thunk will poll and update state). Do not await — show progress on output page.
+      dispatch(createAssignment(payload))
+      router.push('/assessment-output')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      toast.error(message || "Failed to create assignment")
     } finally {
       submitInFlightRef.current = false
     }
@@ -229,20 +171,6 @@ export function AssignmentForm() {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {status === 'succeeded' && createdAssignment?.generated && (
-        <div className="mb-6 space-y-4">
-          <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/30 flex items-center gap-3">
-            <Check size={20} className="text-green-500" />
-            <p className="text-green-500">Assignment created successfully.</p>
-          </div>
-          <GeneratedPreview
-            title={createdAssignment.title}
-            dueDate={createdAssignment.dueDate}
-            questionTypes={createdAssignment.questionTypes}
-            generated={createdAssignment.generated}
-          />
-        </div>
-      )}
 
       {(formError || error) && (
         <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30">

@@ -1,14 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React from 'react'
 
 export function ClientFormattedDate({ value }: { value: string }) {
-  const [formatted, setFormatted] = useState<string>('')
-
-  useEffect(() => {
-    const parsed = new Date(value)
-    setFormatted(Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString())
-  }, [value])
-
+  const parsed = React.useMemo(() => new Date(value), [value])
+  const formatted = Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString()
   return <>{formatted || '—'}</>
 }

@@ -104,3 +104,40 @@ export async function GET(
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const user = await getAuthUser(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (user.role !== 'teacher') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const { id } = await params
+    if (!id) {
+      return NextResponse.json({ error: 'Missing assignment ID' }, { status: 400 })
+    }
+
+    await connectDB()
+
+    const assignment = await AssignmentModel.findOne({ _id: id, createdBy: user.id })
+    if (!assignment) {
+      return NextResponse.json({ error: 'Assignment not found or not owned by user' }, { status: 404 })
+    }
+
+    // Delete generated assignment docs associated with this assignment
+    await GeneratedAssignment.deleteMany({ assignmentId: assignment._id })
+    await AssignmentModel.deleteOne({ _id: assignment._id })
+
+    return NextResponse.json({ success: true }, { status: 200 })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to delete assignment'
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
+}

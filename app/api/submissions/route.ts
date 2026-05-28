@@ -11,7 +11,7 @@ import crypto from 'crypto'
 export const maxDuration = 300 // Allow up to 5 minutes for AI grading
 
 // Helper to generate Cloudinary signature for secure uploads
-function generateCloudinarySignature(params: Record<string, any>, apiSecret: string): string {
+function generateCloudinarySignature(params: Record<string, unknown>, apiSecret: string): string {
   const sortedKeys = Object.keys(params).sort()
   const signString = sortedKeys
     .map((key) => `${key}=${params[key]}`)
@@ -20,7 +20,14 @@ function generateCloudinarySignature(params: Record<string, any>, apiSecret: str
 }
 
 // Helper to upload PDF to Cloudinary
-async function uploadToCloudinary(fileBuffer: Buffer, fileName: string, mimeType: string): Promise<any> {
+type CloudinaryUploadResult = {
+  secure_url?: string
+  public_id?: string
+  pages?: number | string
+  [key: string]: unknown
+}
+
+async function uploadToCloudinary(fileBuffer: Buffer, fileName: string, mimeType: string): Promise<CloudinaryUploadResult> {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim() || 'demo'
   const apiKey = process.env.CLOUDINARY_API_KEY?.trim()
   const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim()
@@ -49,9 +56,9 @@ async function uploadToCloudinary(fileBuffer: Buffer, fileName: string, mimeType
     body: formData,
   })
 
-  const data = await res.json()
+  const data = await res.json() as CloudinaryUploadResult
   if (!res.ok) {
-    throw new Error(data.error?.message || 'Failed to upload to Cloudinary')
+    throw new Error(data.error as string || 'Failed to upload to Cloudinary')
   }
 
   return data
@@ -111,10 +118,11 @@ export async function POST(request: Request) {
     let uploadResult
     try {
       uploadResult = await uploadToCloudinary(fileBuffer, file.name, file.type)
-    } catch (uploadError: any) {
+    } catch (uploadError: unknown) {
       console.error('[POST /api/submissions] Cloudinary upload failed:', uploadError)
+      const msg = uploadError instanceof Error ? uploadError.message : String(uploadError)
       return NextResponse.json(
-        { error: `Cloudinary upload failed: ${uploadError.message}. Make sure your Cloudinary environment variables are configured.` },
+        { error: `Cloudinary upload failed: ${msg}. Make sure your Cloudinary environment variables are configured.` },
         { status: 500 }
       )
     }
@@ -289,7 +297,7 @@ export async function GET(request: Request) {
 
     await connectDB()
 
-    const query: Record<string, any> = {}
+    const query: Record<string, unknown> = {}
 
     // Students only fetch their own submissions. Teachers can fetch all submissions.
     if (user.role === 'student') {

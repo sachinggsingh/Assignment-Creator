@@ -1,47 +1,47 @@
 services:
-  app:
-    build: .
-    container_name: asssment-app
-    ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: production
-      MONGODB_URI: mongodb://mongo:27017/asssment
-      REDIS_HOST: redis
-      REDIS_PORT: "6379"
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: your_jwt_secret_here
-    depends_on:
-      - mongo
-      - redis
-    restart: unless-stopped
+  # app:
+  #   build: .
+  #   container_name: asssment-app
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     NODE_ENV: production
+  #     MONGODB_URI: mongodb://mongo:27017/asssment
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: "6379"
+  #     REDIS_URL: redis://redis:6379
+  #     JWT_SECRET: your_jwt_secret_here
+  #   depends_on:
+  #     - mongo
+  #     - redis
+  #   restart: unless-stopped
 
-  worker:
-    build: .
-    container_name: asssment-worker
-    command: npm run worker
-    environment:
-      NODE_ENV: production
-      MONGODB_URI: mongodb://mongo:27017/asssment
-      REDIS_URL: redis://redis:6379
-      JWT_SECRET: your_jwt_secret_here
-    depends_on:
-      - mongo
-      - redis
-    restart: unless-stopped
+  # worker:
+  #   build: .
+  #   container_name: asssment-worker
+  #   command: npm run worker
+  #   environment:
+  #     NODE_ENV: production
+  #     MONGODB_URI: mongodb://mongo:27017/asssment
+  #     REDIS_URL: redis://redis:6379
+  #     JWT_SECRET: your_jwt_secret_here
+  #   depends_on:
+  #     - mongo
+  #     - redis
+  #   restart: unless-stopped
 
-  bull-board:
-    build: .
-    container_name: asssment-bull-board
-    command: npm run board
-    ports:
-      - "3001:3001"
-    environment:
-      NODE_ENV: production
-      REDIS_URL: redis://redis:6379
-    depends_on:
-      - redis
-    restart: unless-stopped
+  # bull-board:
+  #   build: .
+  #   container_name: asssment-bull-board
+  #   command: npm run board
+  #   ports:
+  #     - "3001:3001"
+  #   environment:
+  #     NODE_ENV: production
+  #     REDIS_URL: redis://redis:6379
+  #   depends_on:
+  #     - redis
+  #   restart: unless-stopped
 
   redis:
     image: redis:alpine
@@ -52,15 +52,15 @@ services:
       - redis-data:/data
     restart: unless-stopped
 
-  mongo:
-    image: mongo:7.0
-    container_name: mongo-server
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    restart: unless-stopped
+  # mongo:
+  #   image: mongo:7.0
+  #   container_name: mongo-server
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongo-data:/data/db
+  #   restart: unless-stopped
 
 volumes:
   redis-data:
-  mongo-data:
+  # mongo-data:

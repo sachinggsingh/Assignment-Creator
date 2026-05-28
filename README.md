@@ -59,6 +59,7 @@ graph TD
 - Node.js (v20+)
 - Docker (for running Redis)
 - MongoDB Cluster (or local instance)
+- **Google Gemini API key** — get one at [aistudio.google.com](https://aistudio.google.com/apikey)
 
 ### 1. Environment Setup
 Clone the repository and install dependencies:
@@ -66,23 +67,32 @@ Clone the repository and install dependencies:
 npm install
 ```
 
-Ensure your `.env` or `.env.local` contains the necessary variables:
+Ensure your `.env` or `.env.local` contains **all** required variables:
 ```env
+# ── Required ──────────────────────────────────────────────
 # Database
 MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/...
 
 # Auth
 JWT_SECRET=your_jwt_secret
 
-# AI
+# AI  (⚠️ worker will refuse to start without this)
 GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash          # optional, defaults to gemini-2.5-flash
+GEMINI_FALLBACK_MODEL=gemini-2.0-flash-lite  # optional
 
 # Redis
 REDIS_URL=redis://127.0.0.1:6379
 
-# Email
+# ── Optional ──────────────────────────────────────────────
+# Email (for assignment notifications)
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_app_password
+
+# Cloudinary (for PDF uploads)
+CLOUDINARY_CLOUD_NAME=demo
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 ```
 
 ### 2. Start Redis
@@ -93,7 +103,7 @@ docker compose up -d
 
 ### 3. Run the Application Services
 
-You will need to run the following commands in separate terminal tabs:
+You will need to run the following commands in **separate terminal tabs**:
 
 **Start the Next.js Frontend & API:**
 ```bash
@@ -101,14 +111,56 @@ npm run dev
 ```
 *(Runs on http://localhost:3000)*
 
-**Start the Background Worker Process:**
+**Start the Background Worker Process (⚠️ REQUIRED for AI generation):**
 ```bash
 npm run worker
 ```
-*(Listens to BullMQ queues and processes AI & Email tasks)*
+The worker will:
+1. Validate that `REDIS_URL`, `MONGODB_URI`, and `GEMINI_API_KEY` are set — exits immediately with a clear error if any are missing.
+2. Connect to Redis and start listening for `assignment-generation` and `email-notification` jobs.
+3. Log startup diagnostics so you can confirm it's healthy.
+
+> **Without the worker running, assignment generation jobs will stay in the queue indefinitely and never complete.**
 
 **Start the Queue Dashboard (Optional):**
 ```bash
 npm run board
 ```
-*(Runs on http://localhost:3001/admin/queues - View active, failed, and completed jobs)*
+*(Runs on http://localhost:3001/admin/queues — View active, failed, and completed jobs)*
+
+### 4. Worker Health Check
+
+A health check endpoint is available to verify the worker and queue status:
+
+```bash
+curl http://localhost:3000/api/jobs/health
+```
+
+**Response example (healthy):**
+```json
+{
+  "success": true,
+  "status": "healthy",
+  "queue": { "waiting": 0, "active": 0, "completed": 5, "failed": 0, "delayed": 0, "paused": 0 },
+  "workers": 1,
+  "redis": "connected",
+  "timestamp": "2025-01-01T00:00:00.000Z"
+}
+```
+
+| Status     | Meaning                                           |
+|------------|---------------------------------------------------|
+| `healthy`  | Redis connected, workers processing jobs          |
+| `degraded` | Redis connected, but **no workers** are running   |
+| `down`     | Redis unreachable (HTTP 503)                      |
+
+### 5. Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Worker exits with `❌ missing environment variables` | `.env` is incomplete | Add the missing keys listed in the error |
+| Worker logs `ECONNREFUSED 127.0.0.1:6379` | Redis is not running | Run `docker compose up -d` |
+| Assignment stays "pending" forever | Worker process is not running | Open a new terminal and run `npm run worker` |
+| Health check returns `"status": "degraded"` | Worker is not connected | Start the worker with `npm run worker` |
+| AI generation fails with 401/403 | Invalid `GEMINI_API_KEY` | Replace with a valid key from [AI Studio](https://aistudio.google.com/apikey) |
+

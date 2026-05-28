@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import type { Assignment, AssignmentState, CreateAssignmentPayload } from '@/types/type'
 
-const initialState: AssignmentState = {
+const initialState: AssignmentState & { formSnapshot?: CreateAssignmentPayload | null } = {
   status: 'idle',
   error: null,
   createdAssignment: null,
+  formSnapshot: null,
 }
 
 async function readApiError(response: Response): Promise<string> {
@@ -86,6 +87,34 @@ export const createAssignment = createAsyncThunk(
   }
 )
 
+export const discardAssignment = createAsyncThunk(
+  'assignments/discardAssignment',
+  async (assignmentId: string, { rejectWithValue, signal }) => {
+    try {
+      const res = await fetch(`/api/assignments/${assignmentId}`, {
+        method: 'DELETE',
+        credentials: 'same-origin',
+        signal,
+      })
+
+      if (!res.ok) {
+        try {
+          const data = await res.json()
+          return rejectWithValue(data?.error || 'Failed to discard assignment')
+        } catch {
+          return rejectWithValue(`Request failed with status ${res.status}`)
+        }
+      }
+
+      return { success: true }
+    } catch (error) {
+      if (signal.aborted) return rejectWithValue('Request was cancelled')
+      const message = error instanceof Error ? error.message : 'Failed to discard assignment'
+      return rejectWithValue(message)
+    }
+  }
+)
+
 const assignmentSlice = createSlice({
   name: 'assignments',
   initialState,
@@ -94,6 +123,12 @@ const assignmentSlice = createSlice({
       state.status = 'idle'
       state.error = null
       state.createdAssignment = null
+    },
+    setFormSnapshot(state, action) {
+      state.formSnapshot = action.payload
+    },
+    clearFormSnapshot(state) {
+      state.formSnapshot = null
     },
   },
   extraReducers: (builder) => {
@@ -117,8 +152,21 @@ const assignmentSlice = createSlice({
         state.error =
           typeof action.payload === 'string' ? action.payload : 'Failed to create assignment'
       })
+      .addCase(discardAssignment.pending, (state) => {
+        state.status = 'loading'
+        state.error = null
+      })
+      .addCase(discardAssignment.fulfilled, (state) => {
+        state.status = 'idle'
+        state.error = null
+        state.createdAssignment = null
+      })
+      .addCase(discardAssignment.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = typeof action.payload === 'string' ? action.payload : 'Failed to discard assignment'
+      })
   },
 })
 
-export const { resetAssignmentStatus } = assignmentSlice.actions
+export const { resetAssignmentStatus, setFormSnapshot, clearFormSnapshot } = assignmentSlice.actions
 export default assignmentSlice.reducer

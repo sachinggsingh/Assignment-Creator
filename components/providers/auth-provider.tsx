@@ -52,7 +52,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    void refreshUser()
+    void (async () => {
+      await refreshUser()
+    })()
   }, [refreshUser])
 
   const value = useMemo(
