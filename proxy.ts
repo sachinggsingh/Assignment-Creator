@@ -37,7 +37,7 @@ function isProtectedApiPath(pathname: string) {
   return pathname.startsWith('/api/assignments')
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = getToken(request)
   const payload = token ? await verifyAuthToken(token) : null

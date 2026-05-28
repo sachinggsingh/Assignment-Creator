@@ -1,13 +1,25 @@
 import IORedis from "ioredis"
 
-const redisUrl = process.env.REDIS_URL
-const redisHost = process.env.REDIS_HOST || "127.0.0.1"
-const redisPort = Number(process.env.REDIS_PORT || 6379)
+let redisConnection: IORedis | null = null
 
-export const redisConnection = redisUrl
-  ? new IORedis(redisUrl, { maxRetriesPerRequest: null })
-  : new IORedis({
-      host: redisHost,
-      port: redisPort,
+export function getRedisConnection() {
+  if (!redisConnection) {
+    if (!process.env.REDIS_URL) {
+      throw new Error("REDIS_URL is missing")
+    }
+
+    redisConnection = new IORedis(process.env.REDIS_URL, {
       maxRetriesPerRequest: null,
     })
+
+    redisConnection.on("connect", () => {
+      console.log("Redis connected")
+    })
+
+    redisConnection.on("error", (err) => {
+      console.error("Redis error:", err.message)
+    })
+  }
+
+  return redisConnection
+}
