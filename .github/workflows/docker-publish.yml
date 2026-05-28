@@ -1,62 +1,50 @@
-name: Build and Publish Docker Images
+name: Build and Publish Docker Image
 
 on:
   push:
     branches:
       - main
-    tags:
-      - 'v*'
+
   workflow_dispatch:
 
-env:
-  IMAGE_NAME: asssment
 
 jobs:
-  build-and-publish:
+  docker:
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       packages: write
-      id-token: write
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
+      # Checkout repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      # Setup Docker Buildx
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Login to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Next.js app
-        run: npm run build
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v5
-        with:
-          registry: docker.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v5
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+      # Build and Push Docker Image
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile
-          push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
+          file: ./Dockerfile
+
+          push: true
+
           tags: |
-            docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-            docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          platforms: linux/amd64,linux/arm64
+            ${{ secrets.DOCKERHUB_USERNAME }}/asssment:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/asssment:${{ github.sha }}
+
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+          platforms: linux/amd64
