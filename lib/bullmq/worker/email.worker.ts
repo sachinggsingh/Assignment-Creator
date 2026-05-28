@@ -1,6 +1,6 @@
 import { Worker } from "bullmq"
 import IORedis from "ioredis"
-import { sendMail } from "@/lib/mail/sendMail"
+import { sendMail } from "../../mail/sendMail"
 
 new Worker(
   "email-notification",

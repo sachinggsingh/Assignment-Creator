@@ -1,6 +1,6 @@
 import { generateText } from 'ai';
-import { getGeminiModel } from '@/lib/ai/gemini-provider';
-import { type GenerateAssignmentInput } from '@/types/type';
+import { getGeminiModel } from './gemini-provider';
+import type { GenerateAssignmentInput } from '../../types/type';
 
 function buildPrompt(input: GenerateAssignmentInput): string {
   // Build a hyper-descriptive, human-readable prompt with ACTUAL values

@@ -1,5 +1,5 @@
 import { Queue } from "bullmq";
-import { getRedisConnection } from "@/lib/redis/redis";
+import { getRedisConnection } from "../../redis/redis";
 
 const isBuild = process.env.npm_lifecycle_event === "build" || process.env.NEXT_PHASE === "phase-production-build";
 

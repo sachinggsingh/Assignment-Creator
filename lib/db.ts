@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import type { MongooseCache } from '@/types/type'
+import type { MongooseCache } from '../types/type'
 
 const globalCache = globalThis as typeof globalThis & {
   mongoose?: MongooseCache

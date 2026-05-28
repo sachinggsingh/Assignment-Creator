@@ -1,10 +1,10 @@
 import { Worker } from "bullmq"
 import IORedis from "ioredis"
-import { connectDB } from "@/lib/db"
-import { Assignment } from "@/models/assignment"
-import { GeneratedAssignment } from "@/models/generatedAssignment"
-import { generateAssignment } from "@/lib/ai/generate-assignment"
-import { emailQueue } from "@/lib/bullmq/queue/email.queue"
+import { connectDB } from "../../db"
+import { Assignment } from "../../../models/assignment"
+import { GeneratedAssignment } from "../../../models/generatedAssignment"
+import { generateAssignment } from "../../ai/generate-assignment"
+import { emailQueue } from "../queue/email.queue"
 
 type GeneratedQuestion = {
   questionText?: string
