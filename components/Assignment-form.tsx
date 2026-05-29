@@ -1,12 +1,13 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Info, UploadCloud } from 'lucide-react'
 import { toast } from 'sonner'
+import { showErrorToast } from '@/lib/toast'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -125,10 +126,13 @@ export function AssignmentForm() {
       (state: RootState) => state.assignments
     )
 
-  const [formError, setFormError] =
-    useState<string | null>(null)
-
   const submitInFlightRef = useRef(false)
+
+  useEffect(() => {
+    if (error) {
+      showErrorToast()
+    }
+  }, [error])
 
   const {
     register,
@@ -224,10 +228,7 @@ export function AssignmentForm() {
       )
 
     if (hasInvalidType) {
-      setFormError(
-        'Please choose a valid question type'
-      )
-
+      showErrorToast()
       return null
     }
 
@@ -260,22 +261,12 @@ export function AssignmentForm() {
 
     submitInFlightRef.current = true
 
-    setFormError(null)
-
     try {
       dispatch(setFormSnapshot(payload))
       void dispatch(createAssignment(payload))
       router.push('/assessment-output')
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : String(err)
-
-      toast.error(
-        message ||
-          'Failed to create assignment'
-      )
+    } catch {
+      showErrorToast()
     } finally {
       submitInFlightRef.current = false
     }
@@ -285,14 +276,6 @@ export function AssignmentForm() {
 
   return (
     <div className="mx-auto w-full max-w-4xl">
-      {(formError || error) && (
-        <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4">
-          <p className="text-red-500">
-            {formError ?? error}
-          </p>
-        </div>
-      )}
-
       <form
         onSubmit={(e) =>
           void handleSubmit(onSubmit)(e)
@@ -643,12 +626,7 @@ export function AssignmentForm() {
             disabled={isLoading}
             onClick={() => {
               reset()
-
-              setFormError(null)
-
-              dispatch(
-                resetAssignmentStatus()
-              )
+              dispatch(resetAssignmentStatus())
             }}
           >
             Reset

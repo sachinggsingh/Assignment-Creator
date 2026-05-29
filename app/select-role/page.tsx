@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/components/providers/auth-provider'
 import { cn } from '@/lib/utils'
+import { showErrorToast } from '@/lib/toast'
 import { getPersistedRole, setStoredRole } from '@/lib/auth-role'
 import type { UserRole } from '@/types/type'
 
@@ -54,8 +55,6 @@ export default function SelectRolePage() {
   const router = useRouter()
   const { user, isLoaded, refreshUser } = useAuth()
   const [pendingRole, setPendingRole] = useState<UserRole | null>(null)
-  const [errorMessage, setErrorMessage] = useState('')
-
   const existingRole = getPersistedRole(user)
   const isSaving = pendingRole !== null
 
@@ -80,7 +79,6 @@ export default function SelectRolePage() {
     }
 
     setPendingRole(role)
-    setErrorMessage('')
 
     try {
       const response = await fetch('/api/auth/role', {
@@ -98,11 +96,9 @@ export default function SelectRolePage() {
       setStoredRole(role)
       await refreshUser()
       router.replace('/dashboard')
-    } catch (error) {
+    } catch {
       setPendingRole(null)
-      setErrorMessage(
-        error instanceof Error ? error.message : 'Unable to save your role. Please try again.'
-      )
+      showErrorToast()
     }
   }
 
@@ -191,12 +187,6 @@ export default function SelectRolePage() {
             )
           })}
         </div>
-
-        {errorMessage ? (
-          <p className="mt-6 text-center text-sm text-destructive" role="alert">
-            {errorMessage}
-          </p>
-        ) : null}
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">

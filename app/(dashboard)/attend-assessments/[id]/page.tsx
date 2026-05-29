@@ -9,6 +9,7 @@ import {
 import { useRouter } from 'next/navigation'
 
 import { ClientFormattedDate } from '@/components/client-formatted-date'
+import { showErrorToast } from '@/lib/toast'
 
 import type {
   Assignment,
@@ -220,14 +221,13 @@ export default function AssessmentDetailPage({
 
   const [assignment, setAssignment] = useState<Assignment | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [loadFailed, setLoadFailed] = useState(false)
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
   const [submission, setSubmission] = useState<Submission | null>(null)
   const [submissionLoading, setSubmissionLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [gradingStage, setGradingStage] = useState(0)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [uploadError, setUploadError] = useState<string | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
 
   useEffect(() => {
@@ -279,9 +279,10 @@ export default function AssessmentDetailPage({
         ) {
           setSubmission(subData.submissions[0])
         }
-      } catch (err) {
+      } catch {
         if (isMounted) {
-          setError(err instanceof Error ? err.message : 'Unable to load details')
+          showErrorToast()
+          setLoadFailed(true)
         }
       } finally {
         if (isMounted) {
@@ -333,13 +334,12 @@ export default function AssessmentDetailPage({
     if (!file) return
 
     if (file.type !== 'application/pdf') {
-      setUploadError('Only PDF files are supported for answer sheet uploads.')
+      showErrorToast()
       setSelectedFile(null)
       return
     }
 
     setSelectedFile(file)
-    setUploadError(null)
   }
 
   function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
@@ -359,13 +359,12 @@ export default function AssessmentDetailPage({
     if (!file) return
 
     if (file.type !== 'application/pdf') {
-      setUploadError('Only PDF files are supported for answer sheet uploads.')
+      showErrorToast()
       setSelectedFile(null)
       return
     }
 
     setSelectedFile(file)
-    setUploadError(null)
   }
 
   async function handleUploadSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -374,7 +373,6 @@ export default function AssessmentDetailPage({
 
     setGradingStage(0)
     setSubmitting(true)
-    setUploadError(null)
 
     const formData = new FormData()
     formData.append('file', selectedFile)
@@ -395,12 +393,8 @@ export default function AssessmentDetailPage({
         setSubmission(data.submission)
         setSelectedFile(null)
       }
-    } catch (err) {
-      setUploadError(
-        err instanceof Error
-          ? err.message
-          : 'An error occurred during homework grading.'
-      )
+    } catch {
+      showErrorToast()
     } finally {
       setSubmitting(false)
     }
@@ -417,15 +411,12 @@ export default function AssessmentDetailPage({
     )
   }
 
-  if (error) {
+  if (loadFailed) {
     return (
       <div className="mx-auto max-w-2xl space-y-4 py-12">
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-6">
-          <p className="text-sm font-medium text-red-500">{error}</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            The assignment may not exist or you may not have authorization.
-          </p>
-        </div>
+        <p className="text-sm text-muted-foreground">
+          Unable to load this assessment. Please try again later.
+        </p>
         <button
           type="button"
           onClick={() => router.push('/attend-assessments')}
@@ -616,11 +607,6 @@ export default function AssessmentDetailPage({
                 </label>
               </div>
             </div>
-            {uploadError && (
-              <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3">
-                <p className="text-xs font-medium text-red-500">{uploadError}</p>
-              </div>
-            )}
             <div className="flex justify-end pt-2">
               <button
                 type="submit"

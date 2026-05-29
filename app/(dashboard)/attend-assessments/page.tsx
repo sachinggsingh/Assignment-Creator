@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ClientFormattedDate } from '@/components/client-formatted-date'
+import { showErrorToast } from '@/lib/toast'
 import type { Assignment } from '@/types/type'
 
 function totalQuestionCount(assignment: Assignment) {
@@ -29,7 +30,7 @@ function computeTotalMarks(assignment: Assignment) {
 export default function Page() {
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [loadFailed, setLoadFailed] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -53,9 +54,10 @@ export default function Page() {
         if (isMounted) {
           setAssignments(Array.isArray(data.assignments) ? data.assignments : [])
         }
-      } catch (err) {
+      } catch {
         if (isMounted) {
-          setError(err instanceof Error ? err.message : 'Unable to load assignments')
+          showErrorToast()
+          setLoadFailed(true)
         }
       } finally {
         if (isMounted) {
@@ -75,14 +77,11 @@ export default function Page() {
     return <p className="text-sm text-muted-foreground">Loading assignments...</p>
   }
 
-  if (error) {
+  if (loadFailed) {
     return (
-      <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-6">
-        <p className="text-sm font-medium text-red-500">{error}</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Check that MongoDB is connected and refresh the page.
-        </p>
-      </div>
+      <p className="text-sm text-muted-foreground">
+        Unable to load assignments. Please refresh the page.
+      </p>
     )
   }
 

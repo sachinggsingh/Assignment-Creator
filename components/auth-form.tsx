@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/components/providers/auth-provider'
+import { showErrorToast } from '@/lib/toast'
 
 type AuthFormProps = {
   mode: 'sign-in' | 'sign-up'
@@ -19,14 +20,12 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const isSignUp = mode === 'sign-up'
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    setError('')
     setIsSubmitting(true)
 
     try {
@@ -41,14 +40,14 @@ export function AuthForm({ mode }: AuthFormProps) {
 
       const data = await response.json()
       if (!response.ok) {
-        setError(typeof data?.error === 'string' ? data.error : 'Request failed')
+        showErrorToast()
         return
       }
 
       await refreshUser()
       router.replace(data.user?.role ? '/dashboard' : '/select-role')
     } catch {
-      setError('Something went wrong. Please try again.')
+      showErrorToast()
     } finally {
       setIsSubmitting(false)
     }
@@ -106,12 +105,6 @@ export function AuthForm({ mode }: AuthFormProps) {
             required
           />
         </div>
-
-        {error ? (
-          <p className="text-sm text-destructive" role="alert">
-            {error}
-          </p>
-        ) : null}
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? (

@@ -1,13 +1,15 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import { showErrorToast } from '@/lib/toast'
 import { useRouter } from 'next/navigation'
 import { useAppDispatch, useAppSelector } from '@/lib/hooks'
 import type { RootState } from '@/lib/store'
 import type { GeneratedSection, GeneratedQuestion } from '@/types/type'
 import { ClientFormattedDate } from '@/components/client-formatted-date'
 import { resetAssignmentStatus, clearFormSnapshot, discardAssignment } from '@/lib/features/assignments/assignmentSlice'
-import { Database, Trash } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Database, Trash2 } from 'lucide-react'
 
 const STATE_LABELS: Record<string, string> = {
   waiting: 'Queued',
@@ -27,6 +29,19 @@ export default function AssessmentOutputPage() {
     generationState,
     generationProgress,
   } = useAppSelector((s: RootState) => s.assignments)
+
+  const lastErrorToastRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!error) {
+      lastErrorToastRef.current = null
+      return
+    }
+    const key = String(error)
+    if (lastErrorToastRef.current === key) return
+    lastErrorToastRef.current = key
+    showErrorToast()
+  }, [error])
 
   useEffect(() => {
     if (!createdAssignment && status !== 'loading') {
@@ -63,11 +78,6 @@ export default function AssessmentOutputPage() {
             </p>
           </div>
         </div>
-        {error ? (
-          <div className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 p-4">
-            <p className="text-sm text-red-500">{String(error)}</p>
-          </div>
-        ) : null}
       </div>
     )
   }
@@ -76,7 +86,9 @@ export default function AssessmentOutputPage() {
     return (
       <div className="rounded-xl border border-red-500/30 bg-card p-6 max-w-lg">
         <p className="text-sm font-medium text-foreground">Generation failed</p>
-        <p className="mt-2 text-sm text-red-500">{error}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Please try again from the create page.
+        </p>
         <button
           type="button"
           onClick={() => router.push('/create-assessments')}
@@ -103,6 +115,7 @@ export default function AssessmentOutputPage() {
       router.push('/create-assessments')
     } catch (err) {
       console.error('Failed to discard assignment', err)
+      showErrorToast()
     }
   }
 
@@ -128,27 +141,22 @@ export default function AssessmentOutputPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleSave}
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="button" onClick={handleSave} className="gap-2">
+              <Database className="size-4 shrink-0" aria-hidden />
+              Publish
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void handleRegenerate()}
+              className="gap-2"
             >
-              <Database /> Publish
-            </button>
-            <button
-              onClick={handleRegenerate}
-              className="rounded-lg border border-border px-4 py-2 text-sm font-semibold"
-            >
-              <Trash /> Regenerate
-            </button>
+              <Trash2 className="size-4 shrink-0" aria-hidden />
+              Regenerate
+            </Button>
           </div>
         </div>
-
-        {error ? (
-          <div className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 p-4">
-            <p className="text-sm text-red-500">{String(error)}</p>
-          </div>
-        ) : null}
 
         <div className="mt-6 space-y-4">
           {generated?.sections.map((section: GeneratedSection) => (

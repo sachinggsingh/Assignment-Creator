@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/components/providers/auth-provider'
 import { ClientFormattedDate } from '@/components/client-formatted-date'
+import { showErrorToast } from '@/lib/toast'
 import type { Assignment } from '@/types/type'
 import Link from 'next/link'
 
@@ -85,7 +86,7 @@ function StudentResultsView() {
 
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [loadFailed, setLoadFailed] = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -108,9 +109,10 @@ function StudentResultsView() {
         if (isMounted) {
           setSubmissions(Array.isArray(data.submissions) ? data.submissions : [])
         }
-      } catch (err) {
+      } catch {
         if (isMounted) {
-          setError(err instanceof Error ? err.message : 'Unable to load results')
+          showErrorToast()
+          setLoadFailed(true)
         }
       } finally {
         if (isMounted) setLoading(false)
@@ -130,14 +132,11 @@ function StudentResultsView() {
     )
   }
 
-  if (error) {
+  if (loadFailed) {
     return (
-      <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-6">
-        <p className="text-sm font-medium text-red-500">{error}</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Please refresh the page or check your connection.
-        </p>
-      </div>
+      <p className="text-sm text-muted-foreground">
+        Unable to load results. Please refresh the page.
+      </p>
     )
   }
 
@@ -361,7 +360,7 @@ function StudentResultsView() {
 function TeacherResultsView() {
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [loadFailed, setLoadFailed] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -383,9 +382,10 @@ function TeacherResultsView() {
         if (isMounted) {
           setAssignments(Array.isArray(data.assignments) ? data.assignments : [])
         }
-      } catch (err) {
+      } catch {
         if (isMounted) {
-          setError(err instanceof Error ? err.message : 'Unable to load assessment results')
+          showErrorToast()
+          setLoadFailed(true)
         }
       } finally {
         if (isMounted) setLoading(false)
@@ -400,14 +400,11 @@ function TeacherResultsView() {
     return <p className="text-sm text-muted-foreground">Loading recent results...</p>
   }
 
-  if (error) {
+  if (loadFailed) {
     return (
-      <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-6">
-        <p className="text-sm font-medium text-red-500">{error}</p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Refresh the page and make sure the assessment creation flow has a published draft.
-        </p>
-      </div>
+      <p className="text-sm text-muted-foreground">
+        Unable to load assessment results. Please refresh the page.
+      </p>
     )
   }
 
