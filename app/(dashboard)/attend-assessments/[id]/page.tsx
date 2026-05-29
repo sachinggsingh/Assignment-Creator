@@ -9,6 +9,8 @@ import {
 import { useRouter } from 'next/navigation'
 
 import { ClientFormattedDate } from '@/components/client-formatted-date'
+import { useAuth } from '@/components/providers/auth-provider'
+import { getUserRole } from '@/lib/auth-role'
 import { showErrorToast } from '@/lib/toast'
 
 import type {
@@ -218,6 +220,8 @@ export default function AssessmentDetailPage({
 }) {
   const { id } = use(params)
   const router = useRouter()
+  const { user } = useAuth()
+  const isTeacher = getUserRole(user) === 'teacher'
 
   const [assignment, setAssignment] = useState<Assignment | null>(null)
   const [loading, setLoading] = useState(true)
@@ -574,7 +578,7 @@ export default function AssessmentDetailPage({
         </div>
       )}
 
-      {!submission && !submitting && isReady && (
+      {!submission && !submitting && isReady && !isTeacher && (
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-6">
           <div className="border-b border-border pb-4">
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Submission Area</p>
@@ -623,7 +627,7 @@ export default function AssessmentDetailPage({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">Original Assessment Paper</h3>
-          {submission && (
+          {submission && !isTeacher && (
             <p className="text-xs text-muted-foreground">Submit another file by refreshing the page if needed.</p>
           )}
         </div>
