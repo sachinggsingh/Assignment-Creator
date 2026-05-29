@@ -72,14 +72,12 @@ export function AppSidebar() {
       return isTeacher
     })
     .map((item) => {
-      if (
-        item.href === "/result" &&
-        isTeacher
-      ) {
-        return {
-          ...item,
-          title: "Papers Generated",
-        }
+      if (item.href === "/result" && isTeacher) {
+        return { ...item, title: "Papers Generated" }
+      }
+
+      if (item.href === "/attend-assessments" && isTeacher) {
+        return { ...item, title: "See Assessment" }
       }
 
       return item

@@ -18,7 +18,7 @@ function DashboardHeader() {
       <div className="flex items-center gap-3">
         <SidebarTrigger />
         <div>
-          <p className="text-xl font-medium text-primary">Welcome back {" "}  {user?.name ?? 'Signed-in workspace navigation'}</p>
+          <p className="text-xl font-medium text-primary">Welcome {" "}  {user?.name ?? 'Signed-in workspace navigation'}</p>
           {/* <p className="text-sm text-muted-foreground">
             {user?.name ?? 'Signed-in workspace navigation'}
           </p> */}
