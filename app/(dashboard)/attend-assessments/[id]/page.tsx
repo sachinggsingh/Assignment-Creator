@@ -510,10 +510,12 @@ export default function AssessmentDetailPage({
                   {submission.feedback || 'Excellent homework submission! You demonstrated an outstanding understanding of all assessment topics and applied the concepts correctly.'}
                 </p>
               </div>
+              {/* 
               <div className="border-t border-border mt-4 pt-3 flex justify-between items-center text-xs text-muted-foreground">
                 <span>Model: gemini-2.5-flash</span>
                 <span>Role: student</span>
               </div>
+               */}
             </div>
           </div>
 
