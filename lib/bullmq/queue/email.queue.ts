@@ -6,5 +6,5 @@ const isBuild = process.env.npm_lifecycle_event === "build" || process.env.NEXT_
 export const emailQueue = isBuild
   ? ({} as unknown as Queue)
   : new Queue('email-notification', {
-      connection: getRedisConnection(),
-    })
+        connection: getRedisConnection() as unknown as any,
+      })

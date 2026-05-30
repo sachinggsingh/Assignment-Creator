@@ -20,6 +20,6 @@ new Worker(
     }
   },
   {
-    connection: createBullMQConnection(),
+    connection: createBullMQConnection() as unknown as any,
   }
 )

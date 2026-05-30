@@ -5,4 +5,4 @@ const isBuild = process.env.npm_lifecycle_event === "build" || process.env.NEXT_
 
 export const assignmentQueue = isBuild
   ? ({} as unknown as Queue)
-  : new Queue('assignment-generation', { connection: getRedisConnection() })
+  : new Queue('assignment-generation', { connection: getRedisConnection() as unknown as any })
