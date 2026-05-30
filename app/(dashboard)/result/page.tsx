@@ -127,14 +127,14 @@ function StudentResultsView() {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-16">
         <div className="h-9 w-9 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
-        <p className="text-sm text-muted-foreground animate-pulse">Fetching your graded submissions…</p>
+        <p className="text-base text-muted-foreground animate-pulse">Fetching your graded submissions…</p>
       </div>
     )
   }
 
   if (loadFailed) {
     return (
-      <p className="text-sm text-muted-foreground">
+      <p className="text-base text-muted-foreground">
         Unable to load results. Please refresh the page.
       </p>
     )
@@ -149,27 +149,27 @@ function StudentResultsView() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm text-muted-foreground">Your graded assessments</p>
-        <h1 className="text-2xl font-semibold text-foreground">My Results</h1>
+        <p className="text-base text-muted-foreground">Your graded assessments</p>
+        <h1 className="text-3xl font-semibold text-foreground">My Results</h1>
       </div>
 
       {/* Summary cards */}
       <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Submissions</p>
-          <p className="mt-3 text-2xl font-semibold text-foreground">{totalSubmissions}</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Submissions</p>
+          <p className="mt-3 text-3xl font-semibold text-foreground">{totalSubmissions}</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Marks Scored</p>
-          <p className="mt-3 text-2xl font-semibold text-foreground">{totalScore.toFixed(1).replace('.0', '')}</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Marks Scored</p>
+          <p className="mt-3 text-3xl font-semibold text-foreground">{totalScore.toFixed(1).replace('.0', '')}</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Total Possible</p>
-          <p className="mt-3 text-2xl font-semibold text-foreground">{totalPossible}</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Total Possible</p>
+          <p className="mt-3 text-3xl font-semibold text-foreground">{totalPossible}</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Avg. Grade</p>
-          <p className={`mt-3 text-2xl font-semibold ${avgPercentage >= 75 ? 'text-emerald-500' : avgPercentage >= 40 ? 'text-amber-500' : 'text-red-500'}`}>
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Avg. Grade</p>
+          <p className={`mt-3 text-3xl font-semibold ${avgPercentage >= 75 ? 'text-emerald-500' : avgPercentage >= 40 ? 'text-amber-500' : 'text-red-500'}`}>
             {avgPercentage}%
           </p>
         </div>
@@ -178,13 +178,13 @@ function StudentResultsView() {
       {/* Submissions list */}
       {submissions.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center">
-          <p className="text-lg font-semibold text-foreground">No submissions yet</p>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="text-xl font-semibold text-foreground">No submissions yet</p>
+          <p className="mt-2 text-base text-muted-foreground">
             Go to Attend Assessments, open an assessment, and upload your answer sheet PDF to get graded.
           </p>
           <Link
             href="/attend-assessments"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-base font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
             Browse Assessments →
           </Link>
@@ -214,15 +214,15 @@ function StudentResultsView() {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0 space-y-1">
-                    <p className="text-lg font-semibold text-foreground truncate">{assignmentTitle}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xl font-semibold text-foreground truncate">{assignmentTitle}</p>
+                    <p className="text-sm text-muted-foreground">
                       Submitted on {submission.createdAt ? new Date(submission.createdAt).toLocaleDateString() : '-'} at {submission.createdAt ? new Date(submission.createdAt).toLocaleTimeString() : '-'}
                     </p>
                     <div className="flex flex-wrap items-center gap-2 pt-1">
-                      <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${gradeBadgeColor}`}>
+                      <span className={`rounded-full border px-2.5 py-0.5 text-sm font-semibold ${gradeBadgeColor}`}>
                         {(scoreVal).toFixed(1).replace('.0', '')} / {totalVal} marks
                       </span>
-                      <span className="rounded-full border border-border bg-muted/30 px-2.5 py-0.5 text-xs text-muted-foreground">
+                      <span className="rounded-full border border-border bg-muted/30 px-2.5 py-0.5 text-sm text-muted-foreground">
                         {submission.status === 'graded' ? '✓ Graded' : '⏳ Pending'}
                       </span>
                     </div>
@@ -234,7 +234,7 @@ function StudentResultsView() {
                       href={submission.pdfUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-xs font-semibold text-foreground transition-all hover:bg-muted"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-3 py-1.5 text-sm font-semibold text-foreground transition-all hover:bg-muted"
                       title="View submitted PDF"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -246,7 +246,7 @@ function StudentResultsView() {
                     <button
                       type="button"
                       onClick={() => setExpandedId(isExpanded ? null : submission._id)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground transition-all hover:bg-muted"
+                      className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-semibold text-foreground transition-all hover:bg-muted"
                     >
                       {isExpanded ? 'Hide Details' : 'Show Details'}
                       <svg
@@ -280,26 +280,37 @@ function StudentResultsView() {
                       </div>
                     )}
 
-                    {/* Submitted PDF link (prominent) */}
-                    <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex flex-wrap items-center justify-between gap-3">
-                      <div>
-                        <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Submitted File</p>
-                        <p className="text-xs text-foreground mt-1 break-all font-mono">{submission.pdfUrl}</p>
+                    {/* Submitted PDF download */}
+                    {/* {submission.pdfUrl && (
+                      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                              <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">Submitted Answer Sheet</p>
+                            <p className="text-xs text-muted-foreground">PDF Document</p>
+                          </div>
+                        </div>
+                        <a
+                          href={submission.pdfUrl}
+                          download
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                          </svg>
+                          Download PDF
+                        </a>
                       </div>
-                      <a
-                        href={submission.pdfUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                          <polyline points="7 10 12 15 17 10" />
-                          <line x1="12" y1="15" x2="12" y2="3" />
-                        </svg>
-                        Download PDF
-                      </a>
-                    </div>
+                    )} */}
 
                     {/* Question-by-question breakdown */}
                     {submission.questionsFeedback && submission.questionsFeedback.length > 0 && (

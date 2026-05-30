@@ -3,11 +3,24 @@
 import { useState } from 'react'
 import { Menu, X, ChevronRight, Star, Zap, Brain, Check, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { motion } from 'motion/react'
+
+import { ThemeToggle } from '@/components/theme-toggle'
+import { BackgroundRippleEffect } from '@/components/ui/background-ripple-effect'
+import {
+  Navbar,
+  NavBody,
+  NavItems,
+  MobileNav,
+  MobileNavHeader,
+  MobileNavMenu,
+  MobileNavToggle,
+  NavbarButton,
+} from "@/components/ui/resizable-navbar"
 
 const navLinks = [
   { href: '#features', label: 'Features' },
   { href: '#pricing', label: 'Pricing' },
-  { href: '#testimonials', label: 'Testimonials' },
   { href: '#about', label: 'About' },
 ]
 
@@ -38,58 +51,52 @@ export default function Home() {
       style={{ fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif" }}
     >
       {/* Navigation */}
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-black/10 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-black/90">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-          <Link href="/" className="flex items-center gap-3">
+      <Navbar className="fixed inset-x-0 top-0 z-50">
+        <NavBody className="mt-4">
+          <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-full opacity-50 mask-radial-from-20% mask-radial-at-top">
+            <BackgroundRippleEffect rows={2} cols={40} cellSize={56} />
+          </div>
+          <Link href="/" className="relative z-20 flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Brain className="h-5 w-5" />
             </div>
-            <span className="text-sm font-semibold tracking-tight">VedaAI</span>
+            <span className="text-sm font-semibold tracking-tight text-black dark:text-white">VedaAI</span>
           </Link>
-
-          <div className="hidden items-center gap-8 md:flex">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-sm text-black/50 transition-colors hover:text-black dark:text-white/50 dark:hover:text-white"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-
-          <div className="hidden items-center gap-3 md:flex">
-            <Link
-              href="/sign-in"
-              className="rounded-full border border-black/20 px-5 py-2 text-sm font-medium transition-all hover:border-black hover:bg-black hover:text-white dark:border-white/20 dark:hover:border-white dark:hover:bg-white dark:hover:text-black"
-            >
+          <NavItems items={navLinks.map(link => ({ name: link.label, link: link.href }))} />
+          <div className="relative z-20 flex items-center gap-3">
+            <ThemeToggle />
+            <NavbarButton href="/sign-in" variant="secondary">
               Sign In
-            </Link>
-            <Link
-              href="/sign-up"
-              className="rounded-full bg-black px-5 py-2 text-sm font-medium text-white transition-all hover:bg-black/80 dark:bg-white dark:text-black dark:hover:bg-white/90"
-            >
+            </NavbarButton>
+            <NavbarButton href="/sign-up" variant="dark">
               Get Started
-            </Link>
+            </NavbarButton>
           </div>
+        </NavBody>
 
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="rounded-md p-2 md:hidden"
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-
-        {menuOpen && (
-          <div className="border-t border-black/10 bg-white px-6 pb-5 pt-4 dark:border-white/10 dark:bg-black">
-            <div className="space-y-1">
+        <MobileNav className="mt-4">
+          <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-2xl opacity-50 mask-radial-from-20% mask-radial-at-top">
+            <BackgroundRippleEffect rows={2} cols={40} cellSize={56} />
+          </div>
+          <MobileNavHeader>
+            <Link href="/" className="relative z-20 flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <Brain className="h-5 w-5" />
+              </div>
+              <span className="text-sm font-semibold tracking-tight text-black dark:text-white">VedaAI</span>
+            </Link>
+            <div className="relative z-20 flex items-center gap-2">
+              <ThemeToggle />
+              <MobileNavToggle isOpen={menuOpen} onClick={() => setMenuOpen(!menuOpen)} />
+            </div>
+          </MobileNavHeader>
+          <MobileNavMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)}>
+            <div className="flex w-full flex-col gap-4">
               {navLinks.map((link) => (
                 <a
-                  key={link.href}
+                  key={link.label}
                   href={link.href}
+                  onClick={() => setMenuOpen(false)}
                   className="block rounded-md px-3 py-2 text-sm text-black/60 hover:bg-black/5 hover:text-black dark:text-white/60 dark:hover:bg-white/5 dark:hover:text-white"
                 >
                   {link.label}
@@ -110,68 +117,79 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-          </div>
-        )}
-      </nav>
+          </MobileNavMenu>
+        </MobileNav>
+      </Navbar>
 
       {/* Hero */}
       <section className="relative flex min-h-screen items-center justify-center overflow-hidden pt-20">
-        {/* Subtle grid pattern */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
-          style={{
-            backgroundImage:
-              'linear-gradient(black 1px, transparent 1px), linear-gradient(90deg, black 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
+        {/* Ripple effect background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <BackgroundRippleEffect />
+        </div>
 
         {/* Large typographic accent */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
           <span
-            className="select-none text-[22vw] font-black leading-none tracking-tighter text-black/[0.03] dark:text-white/[0.03]"
+            className=" mt-12 select-none text-[22vw] font-black leading-none tracking-tighter text-black/[0.08] dark:text-white/[0.08]"
           >
             AI
           </span>
         </div>
 
         <div className="relative z-10 mx-auto max-w-5xl px-6 text-center lg:px-8">
-          <div className="mx-auto mb-8 inline-flex items-center gap-2 rounded-full border border-black/15 bg-black/5 px-4 py-1.5 text-xs font-medium uppercase tracking-widest dark:border-white/15 dark:bg-white/5">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-black dark:bg-white" />
-            AI-Powered Assessment Generation
-          </div>
-
-          <h1
-            className="mx-auto max-w-4xl text-5xl font-black leading-[0.95] tracking-tighter sm:text-6xl md:text-8xl"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
           >
-            Create
-            <br />
-            <span className="text-black/20 dark:text-white/20">assessments</span>
-            <br />
-            instantly.
-          </h1>
+            <div className="mx-auto mb-8 inline-flex items-center gap-2 rounded-full border border-black/15 bg-black/5 px-4 py-1.5 text-xs font-medium uppercase tracking-widest dark:border-white/15 dark:bg-white/5">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-black dark:bg-white" />
+              AI-Powered Assessment Generation
+            </div>
 
-          <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-black/50 dark:text-white/50 sm:text-lg">
-            Save time, improve quality, and deliver polished assessments with an AI workflow built for educators and training teams.
-          </p>
+            <h1
+              className="mx-auto max-w-4xl text-5xl font-black leading-[0.95] tracking-tighter sm:text-6xl md:text-8xl"
+            >
+              Create
+              <br />
+              <span className="text-black/20 dark:text-white/20">assessments</span>
+              <br />
+              instantly.
+            </h1>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-black/50 dark:text-white/50 sm:text-lg">
+              Save time, improve quality, and deliver polished assessments with an AI workflow built for educators and training teams.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
+            className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
+          >
             <Link
               href="/sign-up"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-95"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-all hover:opacity-90"
             >
               Start Free Trial
               <ArrowRight className="h-4 w-4" />
             </Link>
             <a
               href="#features"
-              className="inline-flex items-center gap-2 rounded-full border border-border px-8 py-3.5 text-sm font-semibold transition-all hover:border-primary hover:text-foreground"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-transparent px-8 py-3.5 text-sm font-semibold text-foreground transition-all hover:bg-secondary hover:text-secondary-foreground"
             >
               See Features
             </a>
-          </div>
+          </motion.div>
 
-          <div className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-black/10 bg-black/10 sm:grid-cols-3 dark:border-white/10 dark:bg-white/10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
+            className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-black/10 bg-black/10 sm:grid-cols-3 dark:border-white/10 dark:bg-white/10"
+          >
             {[
               { value: '50K+', label: 'Assessments Created' },
               { value: '10K+', label: 'Active Educators' },
@@ -185,12 +203,12 @@ export default function Home() {
                 <p className="mt-1.5 text-xs uppercase tracking-widest text-black/40 dark:text-white/40">{stat.label}</p>
               </div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Features */}
-      <section id="features" className="border-t border-black/10 px-6 py-24 dark:border-white/10 lg:px-8">
+      <section id="features" className="px-6 py-24 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="mb-16 flex items-end justify-between">
             <div>
@@ -210,7 +228,11 @@ export default function Home() {
 
           <div className="grid gap-px overflow-hidden rounded-2xl border border-black/10 bg-black/10 md:grid-cols-3 dark:border-white/10 dark:bg-white/10">
             {featureCards.map((feature, i) => (
-              <div
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
                 key={feature.title}
                 className="group bg-white px-8 py-10 transition-colors hover:bg-black hover:text-white dark:bg-black dark:hover:bg-white dark:hover:text-black"
               >
@@ -220,7 +242,7 @@ export default function Home() {
                 <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest opacity-40">0{i + 1}</p>
                 <h3 className="mb-3 text-xl font-bold tracking-tight">{feature.title}</h3>
                 <p className="text-sm leading-relaxed opacity-50">{feature.description}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -263,8 +285,12 @@ export default function Home() {
                 cta: 'Talk to Sales',
                 highlight: false,
               },
-            ].map((plan) => (
-              <div
+            ].map((plan, i) => (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
                 key={plan.name}
                 className={`rounded-2xl border p-8 ${
                   plan.highlight
@@ -310,7 +336,7 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -370,7 +396,11 @@ export default function Home() {
                 text: "We've cut our assessment creation time by 80%. The ROI has been exceptional for our training programs.",
               },
             ].map((t, i) => (
-              <div
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
                 key={i}
                 className="rounded-2xl border border-black/10 bg-white p-8 dark:border-white/10 dark:bg-black"
               >
@@ -389,7 +419,7 @@ export default function Home() {
                     <p className="text-xs text-black/40 dark:text-white/40">{t.role}</p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

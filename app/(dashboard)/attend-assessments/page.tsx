@@ -74,12 +74,12 @@ export default function Page() {
   }, [])
 
   if (loading) {
-    return <p className="text-sm text-muted-foreground">Loading assignments...</p>
+    return <p className="text-base text-muted-foreground">Loading assignments...</p>
   }
 
   if (loadFailed) {
     return (
-      <p className="text-sm text-muted-foreground">
+      <p className="text-base text-muted-foreground">
         Unable to load assignments. Please refresh the page.
       </p>
     )
@@ -88,8 +88,8 @@ export default function Page() {
   if (assignments.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center">
-        <p className="text-lg font-semibold text-foreground">No assignments available yet</p>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="text-xl font-semibold text-foreground">No assignments available yet</p>
+        <p className="mt-2 text-base text-muted-foreground">
           Create a new assessment from the Create Assessments page to see it appear here.
         </p>
       </div>
@@ -99,8 +99,8 @@ export default function Page() {
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-sm text-muted-foreground">Available assignments</p>
-        <h1 className="text-2xl font-semibold text-foreground">Attend Assessments</h1>
+        <p className="text-base text-muted-foreground">Available assignments</p>
+        <h1 className="text-3xl font-semibold text-foreground">Attend Assessments</h1>
       </div>
 
       <div className="grid gap-4">
@@ -112,18 +112,18 @@ export default function Page() {
             <div key={assignment._id} className="rounded-xl border border-border bg-card p-5 shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-lg font-semibold text-foreground">
+                  <p className="text-xl font-semibold text-foreground">
                     {assignment.title || `Assessment due ${new Date(assignment.dueDate).toLocaleDateString()}`}
                   </p>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-base text-muted-foreground mt-1">
                     ID: {assignment._id}
                   </p>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-base text-muted-foreground mt-1">
                     Due <ClientFormattedDate value={assignment.dueDate} />
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <div className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                  <div className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
                     {isReady ? 'READY' : 'PENDING'}
                   </div>
                 </div>
@@ -131,18 +131,18 @@ export default function Page() {
 
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Questions</p>
-                  <p className="mt-1 text-sm text-foreground">{questionCount}</p>
+                  <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Questions</p>
+                  <p className="mt-1 text-base text-foreground">{questionCount}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Total marks</p>
-                  <p className="mt-1 text-sm text-foreground">
+                  <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Total marks</p>
+                  <p className="mt-1 text-base text-foreground">
                     {computeTotalMarks(assignment)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Created</p>
-                  <p className="mt-1 text-sm text-foreground">
+                  <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Created</p>
+                  <p className="mt-1 text-base text-foreground">
                     <ClientFormattedDate value={assignment.createdAt} />
                   </p>
                 </div>
@@ -154,7 +154,7 @@ export default function Page() {
                 <div className="mt-4 flex flex-wrap items-center gap-3">
                   <Link
                     href={`/attend-assessments/${assignment._id}`}
-                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-base font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                   >
                     View Assessment
                     <svg
@@ -174,7 +174,7 @@ export default function Page() {
                   </Link>
                 </div>
               ) : (
-                <p className="mt-4 text-sm text-amber-600">
+                <p className="mt-4 text-base text-amber-600">
                   Questions are still being prepared for this assignment.
                 </p>
               )}

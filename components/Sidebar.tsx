@@ -98,8 +98,8 @@ export function AppSidebar() {
         V
       </div>
       <div className="flex flex-col min-w-0 overflow-hidden group-data-[collapsible=icon]:hidden">
-        <p className="truncate text-sm font-semibold">VedaAI</p>
-        <p className="truncate text-xs text-muted-foreground">Workspace</p>
+        <p className="truncate text-base font-semibold">VedaAI</p>
+        <p className="truncate text-sm text-muted-foreground">Workspace</p>
       </div>
     </div>
     <div className="group-data-[collapsible=icon]:hidden">

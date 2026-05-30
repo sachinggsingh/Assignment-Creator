@@ -61,8 +61,8 @@ export default function AssessmentOutputPage() {
         <div className="flex items-center gap-4">
           <div className="h-9 w-9 animate-spin rounded-full border-4 border-primary/30 border-t-primary shrink-0" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-foreground">{stateLabel}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="text-base font-medium text-foreground">{stateLabel}</p>
+            <p className="mt-1 text-base text-muted-foreground">
               {progress > 0
                 ? 'Creating your assessment paper…'
                 : 'Waiting for the background worker. This usually takes under a minute.'}
@@ -73,7 +73,7 @@ export default function AssessmentOutputPage() {
                 style={{ width: `${progress > 0 ? progress : 8}%` }}
               />
             </div>
-            <p className="mt-2 text-xs text-muted-foreground tabular-nums">
+            <p className="mt-2 text-sm text-muted-foreground tabular-nums">
               {progress > 0 ? `${progress}%` : '—'}
             </p>
           </div>
@@ -85,14 +85,14 @@ export default function AssessmentOutputPage() {
   if (status === 'failed' && !createdAssignment) {
     return (
       <div className="rounded-xl border border-red-500/30 bg-card p-6 max-w-lg">
-        <p className="text-sm font-medium text-foreground">Generation failed</p>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="text-base font-medium text-foreground">Generation failed</p>
+        <p className="mt-2 text-base text-muted-foreground">
           Please try again from the create page.
         </p>
         <button
           type="button"
           onClick={() => router.push('/create-assessments')}
-          className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+          className="mt-4 rounded-lg bg-primary px-4 py-2 text-base font-semibold text-primary-foreground"
         >
           Back to create
         </button>
@@ -126,16 +126,16 @@ export default function AssessmentOutputPage() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm text-muted-foreground">Preview</p>
-        <h1 className="text-2xl font-semibold text-foreground">Assessment output</h1>
+        <p className="text-base text-muted-foreground">Preview</p>
+        <h1 className="text-3xl font-semibold text-foreground">Assessment output</h1>
       </div>
 
       <div className="rounded-xl border border-border bg-card p-6 max-w-4xl mx-auto shadow-sm">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Generated paper</p>
-            <h2 className="mt-2 text-lg font-semibold text-foreground">{createdAssignment.title}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Generated paper</p>
+            <h2 className="mt-2 text-xl font-semibold text-foreground">{createdAssignment.title}</h2>
+            <p className="mt-1 text-base text-muted-foreground">
               Due <ClientFormattedDate value={createdAssignment.dueDate} /> •{' '}
               {generated?.sections.length ?? 0} sections • {generated?.totalMarks ?? 0} marks
             </p>
@@ -161,19 +161,19 @@ export default function AssessmentOutputPage() {
         <div className="mt-6 space-y-4">
           {generated?.sections.map((section: GeneratedSection) => (
             <div key={section.title} className="rounded-lg border border-border bg-muted/20 p-4">
-              <h3 className="text-sm font-semibold text-foreground">{section.title}</h3>
+              <h3 className="text-base font-semibold text-foreground">{section.title}</h3>
               {section.instructions ? (
-                <p className="mt-1 text-xs text-muted-foreground">{section.instructions}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{section.instructions}</p>
               ) : null}
               <ol className="mt-3 space-y-3">
                 {section.questions.map((question: GeneratedQuestion, index: number) => (
-                  <li key={`${section.title}-${index}`} className="text-sm text-foreground">
+                  <li key={`${section.title}-${index}`} className="text-base text-foreground">
                     <span className="font-medium">Q{index + 1}.</span> {question.questionText}
-                    <span className="ml-2 text-xs text-muted-foreground">
+                    <span className="ml-2 text-sm text-muted-foreground">
                       ({question.type}, {question.marks} marks, {question.difficulty})
                     </span>
                     {question.options && question.options.length > 0 ? (
-                      <ul className="mt-1 list-disc pl-5 text-xs text-muted-foreground">
+                      <ul className="mt-1 list-disc pl-5 text-sm text-muted-foreground">
                         {question.options.map((option: string) => (
                           <li key={option}>{option}</li>
                         ))}
